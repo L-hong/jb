@@ -1,0 +1,13 @@
+---
+- hosts: git
+  tasks:
+    - name: yum makecache
+      shell: yum makecache 
+    - name: yum git
+      yum: 
+        name: git 
+    - name: mkdir 
+      shell: mkdir /root/git
+    - name: git init x.git
+      shell: git init --bare /root/git/test.git
+    
