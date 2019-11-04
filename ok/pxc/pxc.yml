@@ -1,39 +1,57 @@
 ---
-- hosts: pxc
+- hosts: pxc ##集群所有主机
   tasks:
     - name: ping server
       ping:
-    - shell: 'echo $HOSTNAME'
-      register: name
-    - shell: 'hostname | grep -o ..$'
-      register: uuname
-    - name: copy wsrep.cnf
-      copy: 
-        src: wsrep.cnf
-        dest: /etc/percona-xtradb-cluster.conf.d/
+    - name: yum repolist
+      shell: yum makecache
+    - name: install server
+      shell: yum -y install ibev-4.15-1.el6.rf.x86_64.rpm 
+    - name: install mysql
+      script:
+        name: mysql_yum
     - name: copy mysql.conf
       copy: 
         src: mysqld.cnf
         dest: /etc/percona-xtradb-cluster.conf.d/
+    - shell: 'hostname | grep -o ..$'
+      register: uuname
     - name: change mysql.cnf
       replace: 
         path: /etc/percona-xtradb-cluster.conf.d/mysqld.cnf
         regexp: "1"
         replace: "{{uuname.stdout}}"
+    - name: copy wsrep.cnf
+      copy: 
+        src: wsrep.cnf
+        dest: /etc/percona-xtradb-cluster.conf.d/
+    - shell: 'echo $HOSTNAME'
+      register: name  ##将上条命令结果存入变量
     - name: change wsrep.conf
       replace: 
         path: /etc/percona-xtradb-cluster.conf.d/wsrep.cnf
         regexp: pxc-cluster-node-1
-        replace: "{{name.stdout}}"
+        replace: "{{name.stdout}}" ##调用变量的正确输出
     - name: change ip_wsrep.conf
       replace: 
         path: /etc/percona-xtradb-cluster.conf.d/wsrep.cnf
         regexp: "192.168.70.63"
-        replace: "{{ansible_default_ipv4.address}}"
+        replace: "{{ansible_default_ipv4.address}}" ##setup模块变量，节点机ip
         
-    - name: restart server
-      service: 
-        name: "{{servername}}" 
-        enabled: yes
-        state: restarted 
-     
+- hosts: 192.168.1.171  ## pxc集群中做为master
+  tasks:
+    - name: 
+      ping: 
+    - name: start cluster
+      shell: systemctl start mysql@bootstrap.service 
+
+- hosts:       ## pxc集群中其他主机
+  tasks:
+    - name:  
+      ping: 
+    - name: start slave
+      shell:  systemctl restart mysql
+- hosts:       ## pxc集群中所有主机
+  tasks:
+  - name:    ##检测服务
+    shell: ss -tulpn | grep -i :3306

@@ -1,0 +1,40 @@
+---
+- hosts: elasticsearch
+  tasks:
+    - name: ping server
+      ping:
+    - name: yum makecache
+      shell: yum makecache
+    - name: install server
+      yum:
+        name: java-1.8.0-openjdk.x86_64,elasticsearch
+    - shell: 'echo $HOSTNAME'
+      register: elaname
+    - name: change conf
+      copy: 
+        src: elasticsearch.yml
+        dest: /etc/elasticsearch
+    - replace: 
+        path: /etc/elasticsearch/elasticsearch.yml
+        regexp: node-1
+        replace: "{{elaname.stdout}}"
+    - name: restart server
+      service: 
+        name: elasticsearch 
+        enabled: yes
+        state: restarted 
+     
+
+
+
+
+
+
+
+
+
+
+
+
+
+

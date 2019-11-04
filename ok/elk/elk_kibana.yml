@@ -1,0 +1,50 @@
+---
+- hosts: kibana
+  tasks:
+    - name: ping server
+      ping:
+    - name: yum repolist
+      shell: yum makecache
+    - name: install kibana
+      yum:
+        name: kibana
+    - name: change conf
+      lineinfile:
+        path: /opt/kibana/config/kibana.yml 
+        regexp: '# server.port'
+        line: 'server.port: 5601'
+    - lineinfile:
+        path: /opt/kibana/config/kibana.yml 
+        regexp: '# server.host'
+        line: 'server.port: 0.0.0.0'
+    - lineinfile:
+        path: /opt/kibana/config/kibana.yml 
+        regexp: '# elasticsearch.url'
+        line: 'elasticsearch.url:http://'   ##集群中任意一个或者多个IP,建议多个 
+    - lineinfile:
+        path: /opt/kibana/config/kibana.yml 
+        regexp: '# kibana.index'
+        line: 'kibana.index: ".kibana"'
+    - lineinfile:
+        path: /opt/kibana/config/kibana.yml 
+        regexp: '# kibana.defaultAppId'
+        line: 'kibana.defaultAppId: "discover"'
+    - lineinfile:
+        path: /opt/kibana/config/kibana.yml 
+        regexp: '# elasticsearch.pingTimeout'
+        line: 'elasticsearch.pingTimeout: 1500'
+    - lineinfile:
+        path: /opt/kibana/config/kibana.yml 
+        regexp: '# elasticsearch.requestTimeout'
+        line: 'elasticsearch.requestTimeout: 30000'
+    - lineinfile:
+        path: /opt/kibana/config/kibana.yml 
+        regexp: '# elasticsearch.startupTimeout'
+        line: 'elasticsearch.startupTimeout: 5000'
+    - name: start server
+      service:
+        name: kibana
+        state: started
+        enabled: yes
+    - name: check server
+      shell: ss -tulp | grep :5601  

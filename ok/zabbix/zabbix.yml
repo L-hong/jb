@@ -1,0 +1,39 @@
+---
+- hosts: zabbix
+  tasks:
+    - name: ping server
+      ping:
+    - name: yum repolist
+      shell: yum makecache
+    - name: nginx_devel
+      yum: 
+        name: gcc,pcre-devel,openssl-devel
+    - name: make install nginx
+      script: nginx_install
+    - name: change  nginx.conf
+      copy: 
+        src: nginx.conf
+        dest: /usr/local/nginx/conf/
+    - name: copy test.php
+      copy: 
+        src: test.php
+        dest: /usr/local/nginx/html/
+    - name: yum php_devel
+      yum: 
+        name: php,php-mysql,php-fpm
+    - name: yum mariadb
+      yum: 
+        name: mariadb,mariadb-devel,mariadb-server
+    - name: start sql_server
+      shell: systemctl start  mariadb 
+    - name: start php_server
+      shell: systemctl start  php-fpm
+    - name: start nginx
+      shell: /usr/local/nginx/sbin/nginx || /usr/local/nginx/sbin/nginx -s reload
+    - name: curl test.php
+      shell: curl http://localhost/test.php 
+    - name: yum zabbix.devel
+      yum:
+        name:  net-snmp-devel,curl-devel,libevent-devel-2.0.21-4.el7.x86_64.rpm
+    - name: make install zabbix
+      script: zabbix_server

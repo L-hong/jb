@@ -1,0 +1,3 @@
+tar -xf /root/nginx-1.12.2.tar.gz
+cd /root/nginx-1.12.2 &&  /root/nginx-1.12.2/configure --with-http_ssl_module
+cd /root/nginx-1.12.2 && make && make install 

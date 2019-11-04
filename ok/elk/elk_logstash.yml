@@ -1,0 +1,11 @@
+---
+- hosts: logstash
+  tasks:
+    - name: ping server
+      ping:
+    - name: yum repolist
+      shell: yum makecache
+    - name: install logstash
+      yum:
+        name: logstash,java-1.8.0-openjdk
+    - name: change conf

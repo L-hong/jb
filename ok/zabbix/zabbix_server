@@ -1,0 +1,6 @@
+tar -xf /root/zabbix-3.4.4.tar.gz
+cd /root/ abbix-3.4.4 && /root/ abbix-3.4.4/configure  --enable-server --enable-proxy --enable-agent --with-mysql=/usr/bin/mysql_config  --with-net-snmp --with-libcurl
+cd /root/ abbix-3.4.4 && make && make install
+
+
+
