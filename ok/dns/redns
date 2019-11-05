@@ -1,0 +1,7 @@
+#!/bin/bash
+##这是一个批量添加域名解析的本
+if [ $# == 0 ];then
+  echo "主机名"　"IP位" "主机起始编号"　"主机结尾"
+else 
+  echo  "\$GENERATE $3-$4 $1$	A	192.168.1.$2$" >> /var/named/myos.com.zone && systemctl restart named 
+fi 
